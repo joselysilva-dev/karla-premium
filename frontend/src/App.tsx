@@ -8,8 +8,10 @@ import Footer from './components/sections/Footer'
 import Hero from './components/sections/Hero'
 import Navbar from './components/sections/Navbar'
 import Services from './components/sections/Services'
+import HowItWorks from './components/sections/HowItWorks'
 import Results from './components/sections/Results'
 import Testimonials from './components/sections/Testimonials'
+import FAQ from './components/sections/FAQ'
 
 function App() {
   // Initialize Lenis Smooth Scroll
@@ -33,18 +35,20 @@ function App() {
   }, [])
 
   return (
-    <div className="relative min-h-screen bg-zinc-950 text-zinc-100 selection:bg-amber-500 selection:text-zinc-950">
+    <div className="relative min-h-screen bg-[#0F0F14] text-[#F8F8F8] selection:bg-[#8A5CF6] selection:text-[#0F0F14]">
       {/* Premium subtle layout gradient backdrop overlay */}
-      <div className="absolute top-0 left-0 w-full h-[100vh] bg-gradient-to-b from-amber-500/5 via-transparent to-transparent pointer-events-none z-0" />
+      <div className="absolute top-0 left-0 w-full h-[100vh] bg-gradient-to-b from-[#8A5CF6]/5 via-transparent to-transparent pointer-events-none z-0" />
       
       <Navbar />
       <main className="relative z-10">
         <Hero />
         <About />
-        <Services />
         <Benefits />
+        <Services />
+        <HowItWorks />
         <Results />
         <Testimonials />
+        <FAQ />
         <CTA />
         <Contact />
       </main>

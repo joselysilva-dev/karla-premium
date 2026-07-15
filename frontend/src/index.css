@@ -1,12 +1,20 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand-bg: #0F0F14;
+  --color-brand-purple: #8A5CF6;
+  --color-brand-lilac: #C9A6FF;
+  --color-brand-white: #F8F8F8;
+  --color-brand-gray: #A9A9A9;
+}
+
 @layer base {
   html {
     scroll-behavior: auto; /* Because we use Lenis smooth scrolling */
   }
   body {
-    background-color: #09090b; /* bg-zinc-950 equivalent */
-    color: #f4f4f5; /* text-zinc-100 equivalent */
+    background-color: #0F0F14;
+    color: #F8F8F8;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -14,10 +22,10 @@
   }
 }
 
-/* Custom gold selection theme */
+/* Custom premium purple selection theme */
 ::selection {
-  background-color: #d4af37;
-  color: #09090b;
+  background-color: #8A5CF6;
+  color: #0F0F14;
 }
 
 /* Scrollbar custom style */
@@ -25,14 +33,14 @@
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #09090b;
+  background: #0F0F14;
 }
 ::-webkit-scrollbar-thumb {
   background: #27272a;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #d4af37;
+  background: #8A5CF6;
 }
 
 /* Smooth enter animations for texts */
@@ -40,10 +48,22 @@
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
 }
 
-/* Gold glow class */
-.glow-gold {
-  box-shadow: 0 0 30px rgba(212, 175, 55, 0.15);
+/* Purple glassmorphism and glow classes */
+.glow-premium {
+  box-shadow: 0 0 30px rgba(138, 92, 246, 0.15);
 }
-.glow-gold-hover:hover {
-  box-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
+.glow-premium-hover:hover {
+  box-shadow: 0 0 40px rgba(138, 92, 246, 0.3);
+}
+
+.glass-card {
+  background: rgba(15, 15, 20, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(138, 92, 246, 0.12);
+}
+
+.glass-nav {
+  background: rgba(15, 15, 20, 0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(138, 92, 246, 0.1);
 }
