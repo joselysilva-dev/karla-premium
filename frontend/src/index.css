@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@layer base {
+  html {
+    scroll-behavior: auto; /* Because we use Lenis smooth scrolling */
+  }
+  body {
+    background-color: #09090b; /* bg-zinc-950 equivalent */
+    color: #f4f4f5; /* text-zinc-100 equivalent */
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom gold selection theme */
+::selection {
+  background-color: #d4af37;
+  color: #09090b;
+}
+
+/* Scrollbar custom style */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #09090b;
+}
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #d4af37;
+}
+
+/* Smooth enter animations for texts */
+.text-reveal {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+}
+
+/* Gold glow class */
+.glow-gold {
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.15);
+}
+.glow-gold-hover:hover {
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
+}
