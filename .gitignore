@@ -1,0 +1,33 @@
+# ===========================
+# Sistema Operacional
+# ===========================
+.DS_Store
+Thumbs.db
+
+# ===========================
+# Logs
+# ===========================
+*.log
+logs/
+
+# ===========================
+# Variáveis de ambiente
+# ===========================
+.env
+.env.local
+.env.development.local
+.env.production.local
+
+# ===========================
+# Arquivos temporários
+# ===========================
+*.tmp
+*.temp
+.vscode/settings.json
+
+# ===========================
+# Build
+# ===========================
+dist/
+build/
+coverage/s

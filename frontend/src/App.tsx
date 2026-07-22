@@ -12,7 +12,7 @@ import HowItWorks from './components/sections/HowItWorks'
 import Results from './components/sections/Results'
 import Testimonials from './components/sections/Testimonials'
 import FAQ from './components/sections/FAQ'
-
+import ChatWidget from "./components/ChatWidget";
 function App() {
   // Initialize Lenis Smooth Scroll
   useEffect(() => {
@@ -53,6 +53,8 @@ function App() {
         <Contact />
       </main>
       <Footer />
+
+      <ChatWidget />
     </div>
   )
 }
