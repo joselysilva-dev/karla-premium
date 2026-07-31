@@ -6,6 +6,7 @@ import HowItWorks from './components/sections/HowItWorks'
 import Results from './components/sections/Results'
 import Feedbacks from './components/sections/Feedbacks'
 import Contact from './components/sections/Contact'
+import AiAssistant from './components/sections/AiAssistant'
 import Footer from './components/sections/Footer'
 
 function App() {
@@ -17,19 +18,15 @@ function App() {
         <Hero />
 
         <About />
-
         <Services />
-
         <HowItWorks />
-
         <Results />
-
         <Feedbacks />
-
         <Contact />
       </main>
 
       <Footer />
+      <AiAssistant />
     </div>
   )
 }

@@ -1,71 +1,69 @@
-import { MessageCircle, Sparkles } from 'lucide-react'
-
-import {
-  ButtonLink,
-  Container,
-  Reveal,
-  Section,
-  SectionHeader,
-} from '../ui'
+import { MessageCircle } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 
 import { ChatPanel } from '../../features/chat/ChatPanel'
-
-const WHATSAPP_URL =
-  'https://wa.me/5564993195319?text=Olá,%20Karla!%20Conheci%20seu%20site%20e%20gostaria%20de%20saber%20mais%20sobre%20seu%20acompanhamento.'
+import '../../styles/chat.css'
 
 function AiAssistant() {
+  const [isOpen, setIsOpen] = useState(false)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+
+  const closePanel = () => {
+    setIsOpen(false)
+  }
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closePanel()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isOpen) {
+      panelRef.current?.querySelector<HTMLTextAreaElement>('textarea')?.focus()
+      return
+    }
+
+    triggerRef.current?.focus()
+  }, [isOpen])
+
   return (
-    <Section
-      id="ia-karla"
-      className="kk-ai-section"
-    >
-      <Container>
-        <Reveal>
-          <div className="kk-ai-section__intro">
-            <span className="kk-ai-section__badge">
-              <Sparkles size={16} aria-hidden="true" />
-              Karla disponível agora
-            </span>
+    <aside className="kk-ai-widget" aria-label="Conversa com a IA da Karla">
+      <div
+        ref={panelRef}
+        id="kk-ai-chat-panel"
+        className={`kk-ai-widget__panel${isOpen ? ' kk-ai-widget__panel--open' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Conversa com a IA da Karla"
+        aria-hidden={!isOpen}
+        inert={!isOpen}
+      >
+        <ChatPanel variant="widget" onClose={closePanel} />
+      </div>
 
-            <SectionHeader
-              align="center"
-              eyebrow="Converse com a Karla"
-              title="Seu primeiro passo pode começar aqui."
-              description="Conte seu objetivo, tire dúvidas sobre treino, emagrecimento e hábitos saudáveis e receba uma orientação inicial antes de iniciar seu acompanhamento."
-            />
-          </div>
-        </Reveal>
-
-        <Reveal
-          className="kk-ai-section__chat"
-          delay={0.1}
-        >
-          <ChatPanel />
-        </Reveal>
-
-        <Reveal delay={0.15}>
-          <div className="kk-ai-section__cta">
-            <p>
-              Prefere conversar diretamente com a Karla?
-            </p>
-
-            <ButtonLink
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="secondary"
-            >
-              <MessageCircle
-                size={17}
-                aria-hidden="true"
-              />
-
-              Conversar no WhatsApp
-            </ButtonLink>
-          </div>
-        </Reveal>
-      </Container>
-    </Section>
+      <button
+        ref={triggerRef}
+        type="button"
+        className="kk-ai-widget__trigger"
+        aria-label="Abrir conversa com a IA da Karla"
+        aria-expanded={isOpen}
+        aria-controls="kk-ai-chat-panel"
+        onClick={() => setIsOpen(true)}
+      >
+        <MessageCircle size={20} aria-hidden="true" />
+        <span>Fale com a IA da Karla</span>
+      </button>
+    </aside>
   )
 }
 
