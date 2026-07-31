@@ -16,25 +16,36 @@ const WHATSAPP_URL =
 
 const instagramLinks = [
   {
-    label: 'Instagram Treinadora',
+    label: 'Instagram profissional',
     href: 'https://www.instagram.com/karlakarolynnetreinadora',
   },
   {
-    label: 'Instagram Personal',
+    label: 'Instagram pessoal',
     href: 'https://www.instagram.com/karlakarolynne_personal',
   },
 ]
 
 function Contact() {
   return (
-    <Section id="contato" className="kk-contact">
+    <Section
+      id="contato"
+      className="kk-contact"
+    >
       <Container>
         <div className="kk-contact__shell">
           <Reveal>
             <SectionHeader
               align="center"
               eyebrow="Seu próximo passo"
-              title="Pronta para começar a sua evolução?"
+              title={
+                <>
+                  Pronta para começar a sua{' '}
+                  <span className="kk-text-accent">
+                    evolução
+                  </span>
+                  ?
+                </>
+              }
               description="Converse diretamente com a Karla para entender qual acompanhamento faz mais sentido para sua rotina e seus objetivos."
             />
           </Reveal>
@@ -47,7 +58,11 @@ function Contact() {
                 rel="noopener noreferrer"
                 size="large"
               >
-                <MessageCircle size={19} aria-hidden="true" />
+                <MessageCircle
+                  size={19}
+                  aria-hidden="true"
+                />
+
                 Falar com a Karla no WhatsApp
               </ButtonLink>
             </div>
@@ -65,7 +80,11 @@ function Contact() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Camera size={16} aria-hidden="true" />
+                  <Camera
+                    size={16}
+                    aria-hidden="true"
+                  />
+
                   {link.label}
                 </a>
               ))}

@@ -63,7 +63,7 @@ function Results() {
           <SectionHeader
             align="center"
             eyebrow="Resultados reais"
-            title="Transformações construídas com estratégia e constância."
+            title={<>Transformações construídas com <span className="kk-text-accent">estratégia</span> e constância.</>}
             description="Cada mulher possui uma história, uma rotina e um objetivo diferente. Estes são alguns resultados reais de alunas acompanhadas pela Karla."
           />
         </Reveal>

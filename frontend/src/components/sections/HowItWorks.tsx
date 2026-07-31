@@ -47,7 +47,7 @@ function HowItWorks() {
           <SectionHeader
             align="center"
             eyebrow="Como funciona"
-            title="Seu acompanhamento em três passos."
+            title={<>Seu <span className="kk-text-accent">acompanhamento</span> em três passos.</>}
             description="Sem fórmulas prontas. O processo começa entendendo você e evolui de acordo com a sua realidade."
           />
         </Reveal>
@@ -59,7 +59,7 @@ function HowItWorks() {
             return (
               <Reveal
                 key={step.number}
-                delay={index * 0.08}
+                delay={index * 0.09}
                 className="kk-method__step"
               >
                 <Card padding="large">

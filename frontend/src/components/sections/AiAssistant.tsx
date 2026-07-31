@@ -36,6 +36,27 @@ function AiAssistant() {
     triggerRef.current?.focus()
   }, [isOpen])
 
+  useEffect(() => {
+    if (!isOpen) return
+    const panel = panelRef.current
+    const handleTab = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab' || !panel) return
+      const focusable = Array.from(panel.querySelectorAll<HTMLElement>('button:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'))
+      if (!focusable.length) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+    panel?.addEventListener('keydown', handleTab)
+    return () => panel?.removeEventListener('keydown', handleTab)
+  }, [isOpen])
+
   return (
     <aside className="kk-ai-widget" aria-label="Conversa com a IA da Karla">
       <div
@@ -55,13 +76,13 @@ function AiAssistant() {
         ref={triggerRef}
         type="button"
         className="kk-ai-widget__trigger"
-        aria-label="Abrir conversa com a IA da Karla"
+        aria-label="Fale com a IA da Karla"
         aria-expanded={isOpen}
         aria-controls="kk-ai-chat-panel"
-        onClick={() => setIsOpen(true)}
+        onClick={() => setIsOpen((open) => !open)}
       >
         <MessageCircle size={20} aria-hidden="true" />
-        <span>Fale com a IA da Karla</span>
+        <span>IA da Karla</span>
       </button>
     </aside>
   )

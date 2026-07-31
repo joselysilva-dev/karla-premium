@@ -17,6 +17,14 @@ import {
 const services = [
   {
     title: 'Consultoria on-line personalizada',
+    displayTitle: (
+      <>
+        Consultoria on-line{' '}
+        <span className="kk-text-accent">
+          personalizada
+        </span>
+      </>
+    ),
     description:
       'Acompanhamento pensado para quem precisa de flexibilidade sem abrir mão de estratégia. O treino é estruturado de acordo com seus objetivos, sua rotina e seu momento.',
     icon: Laptop,
@@ -25,6 +33,14 @@ const services = [
   },
   {
     title: 'Treino personalizado',
+    displayTitle: (
+      <>
+        Treino{' '}
+        <span className="kk-text-accent">
+          personalizado
+        </span>
+      </>
+    ),
     description:
       'Treinos individualizados, respeitando seu corpo, seu nível de experiência e seus objetivos. Nada de protocolos genéricos ou treino no automático.',
     icon: Dumbbell,
@@ -33,6 +49,14 @@ const services = [
   },
   {
     title: 'Hipertrofia e definição',
+    displayTitle: (
+      <>
+        <span className="kk-text-accent">
+          Hipertrofia
+        </span>{' '}
+        e definição
+      </>
+    ),
     description:
       'Estratégia direcionada para mulheres que buscam desenvolver o corpo, melhorar a definição e evoluir com técnica, segurança e constância.',
     icon: Target,
@@ -51,7 +75,15 @@ function Services() {
         <Reveal>
           <SectionHeader
             eyebrow="Como posso te ajudar"
-            title="Um acompanhamento construído para você."
+            title={
+              <>
+                Um acompanhamento construído para{' '}
+                <span className="kk-text-accent">
+                  você
+                </span>
+                .
+              </>
+            }
             description="Cada mulher tem uma rotina, um corpo e um objetivo diferente. Por isso, o acompanhamento começa pela sua realidade e evolui junto com você."
           />
         </Reveal>
@@ -63,20 +95,22 @@ function Services() {
             return (
               <Reveal
                 key={service.title}
-                delay={index * 0.08}
+                delay={index * 0.09}
               >
                 <Card
                   variant="default"
                   padding="large"
                   className="kk-service-card"
                 >
-                  <Icon
-                    className="kk-service-card__icon"
-                    size={24}
-                    aria-hidden="true"
-                  />
+                  <div className="kk-service-card__icon-wrap">
+                    <Icon
+                      className="kk-service-card__icon"
+                      size={24}
+                      aria-hidden="true"
+                    />
+                  </div>
 
-                  <h3>{service.title}</h3>
+                  <h3>{service.displayTitle}</h3>
 
                   <p>{service.description}</p>
 
