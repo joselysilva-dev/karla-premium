@@ -66,8 +66,23 @@
 }
 
 .kk-ai-widget__panel .kk-chat {
-  height: min(42.5rem, calc(100dvh - 7.5rem - env(safe-area-inset-bottom)));
   max-height: min(42.5rem, calc(100dvh - 7.5rem - env(safe-area-inset-bottom)));
+  min-height: 0;
+}
+
+.kk-ai-widget__panel .kk-chat__header,
+.kk-ai-widget__panel .kk-chat__form {
+  flex: 0 0 auto;
+}
+
+.kk-ai-widget__panel .kk-chat__messages {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.kk-ai-widget__panel .kk-chat__disclaimer {
+  display: none;
 }
 
 .kk-ai-widget__panel .kk-chat__header {
@@ -97,7 +112,6 @@
   }
 
   .kk-ai-widget__panel .kk-chat {
-    height: min(42.5rem, calc(100dvh - 7rem - env(safe-area-inset-bottom)));
     max-height: min(42.5rem, calc(100dvh - 7rem - env(safe-area-inset-bottom)));
   }
 }
