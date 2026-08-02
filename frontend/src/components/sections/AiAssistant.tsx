@@ -8,6 +8,7 @@ function AiAssistant() {
   const [isOpen, setIsOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
+  const wasOpenRef = useRef(false)
 
   const closePanel = () => {
     setIsOpen(false)
@@ -30,10 +31,11 @@ function AiAssistant() {
   useEffect(() => {
     if (isOpen) {
       panelRef.current?.querySelector<HTMLTextAreaElement>('textarea')?.focus()
-      return
+    } else if (wasOpenRef.current) {
+      triggerRef.current?.focus()
     }
 
-    triggerRef.current?.focus()
+    wasOpenRef.current = isOpen
   }, [isOpen])
 
   useEffect(() => {

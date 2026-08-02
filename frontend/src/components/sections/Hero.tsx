@@ -20,6 +20,8 @@ function Hero() {
               src={brandLogo}
               alt="Logo Karla Karolynne"
               className="kk-hero__logo"
+              width="1080"
+              height="1080"
             />
 
             <p className="kk-eyebrow">
@@ -62,6 +64,9 @@ function Hero() {
               src={karlaPortrait}
               className="kk-hero__portrait"
               alt="Karla Karolynne Personal Trainer"
+              width="1080"
+              height="1080"
+              fetchPriority="high"
             />
                       </div>
 

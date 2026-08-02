@@ -21,34 +21,50 @@ import resultado08 from '../../assets/images/transformacoes/antes-depois-08.jpg'
 const resultImages = [
   {
     src: resultado01,
+    width: 1320,
+    height: 1760,
     alt: 'Antes e depois de aluna acompanhada pela Karla Karolynne',
   },
   {
     src: resultado02,
+    width: 1320,
+    height: 1760,
     alt: 'Transformação de aluna acompanhada pela Karla Karolynne',
   },
   {
     src: resultado03,
+    width: 1320,
+    height: 1760,
     alt: 'Antes e depois de aluna acompanhada pela Karla Karolynne',
   },
   {
     src: resultado04,
+    width: 1290,
+    height: 1290,
     alt: 'Evolução de aluna acompanhada pela Karla Karolynne',
   },
   {
     src: resultado05,
+    width: 1290,
+    height: 1290,
     alt: 'Resultado de acompanhamento personalizado com Karla Karolynne',
   },
   {
     src: resultado06,
+    width: 1290,
+    height: 1289,
     alt: 'Transformação de aluna acompanhada pela Karla Karolynne',
   },
   {
     src: resultado07,
+    width: 1290,
+    height: 1289,
     alt: 'Resultado real de aluna acompanhada pela Karla Karolynne',
   },
   {
     src: resultado08,
+    width: 1290,
+    height: 1290,
     alt: 'Evolução de aluna acompanhada pela Karla Karolynne',
   },
 ]
@@ -71,6 +87,7 @@ function Results() {
 
       <div
         className="kk-results__carousel"
+        role="region"
         aria-label="Resultados de alunas"
       >
         <div className="kk-results__track">
@@ -87,6 +104,8 @@ function Results() {
                   src={image.src}
                   alt={isDuplicate ? '' : image.alt}
                   loading="lazy"
+                  width={image.width}
+                  height={image.height}
                 />
               </figure>
             )

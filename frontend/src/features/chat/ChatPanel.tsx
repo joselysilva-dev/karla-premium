@@ -31,7 +31,9 @@ function ChatAvatar({ role }: { role: ChatMessage['role'] }) {
     <img
       className="kk-chat__avatar"
       src={karlaPortrait}
-      alt="Karla Karolynne"
+      alt=""
+      width="1080"
+      height="1080"
     />
   )
 }
@@ -116,6 +118,8 @@ export function ChatPanel({
           className="kk-chat__profile"
           src={karlaPortrait}
           alt="Karla Karolynne"
+          width="1080"
+          height="1080"
         />
 
         <div className="kk-chat__identity">

@@ -5,7 +5,7 @@ export function BrandLogo({ className, ...props }: AnchorHTMLAttributes<HTMLAnch
   return (
     <a className={['kk-brand', className ?? ''].filter(Boolean).join(' ')} href="#inicio" aria-label="Karla Karolynne — página inicial" {...props}>
       <span className="kk-brand__mark" aria-hidden="true">
-        <img src={brandLogo} alt="" />
+        <img src={brandLogo} alt="" width="1080" height="1080" />
       </span>
       <span>
         <span className="kk-brand__name">Karla Karolynne</span>

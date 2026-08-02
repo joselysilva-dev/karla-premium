@@ -1,8 +1,8 @@
 /* Widget flutuante da IA Karla */
 .kk-ai-widget {
-  bottom: calc(1.75rem + env(safe-area-inset-bottom));
+  bottom: calc(3.25rem + env(safe-area-inset-bottom));
   position: fixed;
-  right: 1.25rem;
+  right: 1.5rem;
   z-index: 80;
 }
 
@@ -91,6 +91,13 @@
 
 .kk-ai-widget__panel .kk-chat__close {
   border-radius: 999px;
+}
+
+@media (min-width: 48rem) and (max-width: 63.999rem) {
+  .kk-ai-widget {
+    bottom: calc(2.5rem + env(safe-area-inset-bottom));
+    right: 1.5rem;
+  }
 }
 
 @media (max-width: 47.999rem) {

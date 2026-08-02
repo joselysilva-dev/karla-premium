@@ -21,18 +21,18 @@ import feedback11 from '../../assets/images/feedbacks/feedback-11.jpg'
 import feedback12 from '../../assets/images/feedbacks/feedback-12.jpg'
 
 const feedbackImages = [
-  feedback01,
-  feedback02,
-  feedback03,
-  feedback04,
-  feedback05,
-  feedback06,
-  feedback07,
-  feedback08,
-  feedback09,
-  feedback10,
-  feedback11,
-  feedback12,
+  { src: feedback01, width: 720, height: 1180 },
+  { src: feedback02, width: 720, height: 1209 },
+  { src: feedback03, width: 720, height: 1209 },
+  { src: feedback04, width: 720, height: 1174 },
+  { src: feedback05, width: 720, height: 1152 },
+  { src: feedback06, width: 720, height: 1195 },
+  { src: feedback07, width: 720, height: 1175 },
+  { src: feedback08, width: 720, height: 1295 },
+  { src: feedback09, width: 720, height: 1187 },
+  { src: feedback10, width: 720, height: 1200 },
+  { src: feedback11, width: 720, height: 1205 },
+  { src: feedback12, width: 720, height: 1183 },
 ]
 
 function Feedbacks() {
@@ -69,6 +69,7 @@ function Feedbacks() {
 
       <div
         className="kk-feedbacks__viewport"
+        role="region"
         aria-label="Feedbacks de alunas"
       >
         <div className="kk-feedbacks__track">
@@ -79,17 +80,19 @@ function Feedbacks() {
             return (
               <figure
                 className="kk-feedbacks__card"
-                key={`${image}-${index}`}
+                key={`${image.src}-${index}`}
                 aria-hidden={isDuplicate}
               >
                 <img
-                  src={image}
+                  src={image.src}
                   alt={
                     isDuplicate
                       ? ''
                       : `Feedback de aluna ${index + 1}`
                   }
                   loading="lazy"
+                  width={image.width}
+                  height={image.height}
                 />
               </figure>
             )

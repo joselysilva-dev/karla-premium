@@ -53,6 +53,8 @@ function About() {
               className="kk-about__portrait"
               alt="Karla Karolynne, Personal Trainer"
               loading="lazy"
+              width="1080"
+              height="1080"
             />
           </Reveal>
 
