@@ -132,8 +132,6 @@ ${message}`,
 
     return text.trim();
   } catch (error) {
-    console.error("===== ERRO GEMINI =====");
-    console.error(error);
     throw error;
   }
 }

@@ -1,6 +1,6 @@
 import { chatWithKarla } from "../services/geminiService.js";
 
-export async function chatController(req, res) {
+export async function chatController(req, res, next) {
   try {
     const { message, history = [] } = req.body;
 
@@ -18,10 +18,6 @@ export async function chatController(req, res) {
       });
     }
 
-    console.log("===== NOVA MENSAGEM =====");
-    console.log("Mensagem:", message);
-    console.log("Mensagens no histórico:", history.length);
-
     const resposta = await chatWithKarla(message, history);
 
     return res.status(200).json({
@@ -29,15 +25,6 @@ export async function chatController(req, res) {
       response: resposta,
     });
   } catch (error) {
-    console.error("===== ERRO NO CHAT CONTROLLER =====");
-    console.error(error);
-
-    return res.status(500).json({
-      success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Erro interno ao processar a mensagem.",
-    });
+    next(error);
   }
 }
