@@ -4,7 +4,10 @@ export type ChatHistoryMessage = {
 }
 
 const API_URL =
-  import.meta.env.VITE_API_URL ?? 'http://localhost:3001/api'
+  import.meta.env.VITE_API_URL ??
+  'http://localhost:3001/api'
+
+console.log('API usada pelo chat:', API_URL)
 
 export async function sendMessage(
   message: string,
@@ -21,11 +24,15 @@ export async function sendMessage(
     }),
   })
 
-  const data: { response?: string; error?: string } =
-    await response.json()
+  const data: {
+    response?: string
+    error?: string
+  } = await response.json()
 
   if (!response.ok) {
-    throw new Error(data.error || 'Erro ao consultar a IA.')
+    throw new Error(
+      data.error || 'Erro ao consultar a IA.'
+    )
   }
 
   return data.response ?? ''
