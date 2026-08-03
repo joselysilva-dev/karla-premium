@@ -13,6 +13,7 @@ Copie `.env.example` para `.env` e preencha as variáveis necessárias. O arquiv
 ## Variáveis de ambiente
 
 - `GEMINI_API_KEY`: chave da API Gemini (obrigatória).
+- `GEMINI_MODEL`: identificador do modelo usado nas conversas (opcional; padrão `gemini-3.1-flash-lite`). O backend usa somente este modelo e não faz fallback automático.
 - `FRONTEND_URL`: origem principal autorizada pelo CORS, por exemplo `https://karla-premium.vercel.app` (obrigatória).
 - `ALLOWED_ORIGINS`: origens adicionais autorizadas pelo CORS, separadas por vírgulas (opcional). Exemplo: `http://localhost:5173,https://preview.example.com`.
 - `PORT`: porta HTTP do servidor (opcional; padrão `3001`).

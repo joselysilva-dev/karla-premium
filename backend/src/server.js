@@ -73,7 +73,11 @@ app.use((req, res) => {
 
 function sanitizeErrorMessage(error) {
   const message =
-    typeof error?.message === "string" ? error.message : "Erro sem mensagem.";
+    typeof error?.safeMessage === "string"
+      ? error.safeMessage
+      : typeof error?.message === "string"
+        ? error.message
+        : "Erro sem mensagem.";
   const apiKey = process.env.GEMINI_API_KEY;
 
   return message
@@ -86,6 +90,8 @@ function sanitizeErrorMessage(error) {
 app.use((error, req, res, next) => {
   console.error("Erro interno ao processar requisição.", {
     stage: error?.stage || "http_request",
+    model: error?.model || null,
+    providerCategory: error?.providerCategory || null,
     name: error?.name || "Error",
     code: error?.code ?? null,
     status: error?.status ?? error?.statusCode ?? null,

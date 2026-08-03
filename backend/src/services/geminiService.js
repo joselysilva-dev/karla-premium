@@ -29,27 +29,25 @@ function obterContextoDeHorario() {
 }
 
 function formatarHistorico(history = []) {
-  if (!Array.isArray(history) || history.length === 0) {
-    return "Esta é a primeira mensagem da conversa.";
-  }
-
   // Limita o contexto para evitar crescimento infinito do prompt.
-  const historicoRecente = history.slice(-20);
+  return history.slice(-20).map((item) => ({
+    role: item.role === "assistant" ? "model" : "user",
+    parts: [{ text: item.content }],
+  }));
+}
 
-  return historicoRecente
-    .filter(
-      (item) =>
-        item &&
-        typeof item.content === "string" &&
-        (item.role === "user" || item.role === "assistant")
-    )
-    .map((item) => {
-      const autor =
-        item.role === "user" ? "Aluna" : "Karla";
+function classifyGeminiError(error) {
+  const status = error?.status ?? error?.statusCode;
 
-      return `${autor}: ${item.content}`;
-    })
-    .join("\n\n");
+  if (status === 400) return ["invalid_request", "Requisição rejeitada pelo Gemini."];
+  if (status === 401 || status === 403) {
+    return ["authentication_or_permission", "Chave inválida ou sem permissão no Gemini."];
+  }
+  if (status === 404) return ["model_unavailable", "Modelo inexistente ou indisponível para esta chave."];
+  if (status === 429) return ["rate_limit_or_quota", "Limite de requisições ou cota do Gemini atingido."];
+  if (status >= 500) return ["provider_unavailable", "Serviço Gemini temporariamente indisponível."];
+
+  return ["provider_error", "Falha inesperada na comunicação com o Gemini."];
 }
 
 export async function chatWithKarla(message, history = []) {
@@ -62,32 +60,34 @@ export async function chatWithKarla(message, history = []) {
   const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY,
   });
+  const model =
+    process.env.GEMINI_MODEL?.trim() || "gemini-3.1-flash-lite";
 
   const { hora, saudacao } = obterContextoDeHorario();
 
-  const historicoFormatado = formatarHistorico(history);
+  const contents = [
+    ...formatarHistorico(history),
+    { role: "user", parts: [{ text: message }] },
+  ];
 
   const primeiraMensagem =
     !Array.isArray(history) || history.length === 0;
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-
-      contents: `${karlaPrompt}
+      model,
+      contents,
+      config: {
+        systemInstruction: `${karlaPrompt}
 
 # CONTEXTO DE HORÁRIO
 
 Horário de referência: ${hora}h.
 Saudação adequada neste momento: "${saudacao}".
 
-# CONTEXTO DA CONVERSA
-
-${historicoFormatado}
-
 # REGRAS DE CONTINUIDADE
 
-- Considere o histórico acima antes de responder.
+- Considere o histórico da conversa antes de responder.
 - Não pergunte novamente algo que a aluna já informou.
 - Não repita apresentações.
 - Não repita uma saudação se você já cumprimentou a aluna.
@@ -112,10 +112,11 @@ Não comece novamente com "${saudacao}" apenas por educação.
 Continue naturalmente de onde a conversa parou.`
 }
 
-# MENSAGEM ATUAL
+# IDENTIDADE DOS PAPÉIS
 
-Aluna:
-${message}`,
+- Mensagens com papel "user" são da aluna.
+- Mensagens com papel "model" são respostas anteriores da Karla.`,
+      },
     });
 
     const text =
@@ -127,14 +128,20 @@ ${message}`,
       "";
 
     if (!text.trim()) {
-      throw new Error(
-        "O Gemini retornou uma resposta vazia."
-      );
+      const error = new Error("O Gemini retornou uma resposta vazia.");
+      error.safeMessage = error.message;
+      throw error;
     }
 
     return text.trim();
   } catch (error) {
     error.stage ||= "gemini_generate_content";
+    error.model ||= model;
+    if (!error.safeMessage) {
+      const [category, safeMessage] = classifyGeminiError(error);
+      error.providerCategory = category;
+      error.safeMessage = safeMessage;
+    }
     throw error;
   }
 }
