@@ -22,17 +22,26 @@ if (missingEnvironmentVariables.length > 0) {
 }
 
 const app = express();
-const isProduction = process.env.NODE_ENV === "production";
+
+function normalizeOrigin(origin) {
+  return origin.trim().replace(/\/+$/, "");
+}
+
+const additionalAllowedOrigins = (process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map(normalizeOrigin)
+  .filter(Boolean);
+
 const allowedOrigins = new Set([
-  process.env.FRONTEND_URL.trim().replace(/\/$/, ""),
-  ...(!isProduction ? ["http://localhost:5173"] : []),
+  normalizeOrigin(process.env.FRONTEND_URL),
+  ...additionalAllowedOrigins,
 ]);
 
 app.use(
   cors({
     origin(origin, callback) {
       // Clientes sem Origin são aceitos para health checks e ferramentas de teste.
-      if (!origin || allowedOrigins.has(origin.replace(/\/$/, ""))) {
+      if (!origin || allowedOrigins.has(normalizeOrigin(origin))) {
         callback(null, true);
         return;
       }
