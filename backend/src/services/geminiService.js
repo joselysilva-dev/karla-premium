@@ -53,8 +53,10 @@ function formatarHistorico(history = []) {
 }
 
 export async function chatWithKarla(message, history = []) {
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error("GEMINI_API_KEY não configurada.");
+  if (!process.env.GEMINI_API_KEY?.trim()) {
+    const error = new Error("GEMINI_API_KEY não configurada.");
+    error.stage = "gemini_configuration";
+    throw error;
   }
 
   const ai = new GoogleGenAI({
@@ -70,7 +72,7 @@ export async function chatWithKarla(message, history = []) {
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
+      model: "gemini-2.5-flash",
 
       contents: `${karlaPrompt}
 
@@ -132,6 +134,7 @@ ${message}`,
 
     return text.trim();
   } catch (error) {
+    error.stage ||= "gemini_generate_content";
     throw error;
   }
 }

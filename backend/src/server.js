@@ -62,8 +62,26 @@ app.use((req, res) => {
   });
 });
 
-app.use((_error, req, res, next) => {
-  console.error("Erro interno ao processar requisição.");
+function sanitizeErrorMessage(error) {
+  const message =
+    typeof error?.message === "string" ? error.message : "Erro sem mensagem.";
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  return message
+    .replace(apiKey || /$^/, "[REDACTED]")
+    .replace(/AIza[\w-]+/g, "[REDACTED]")
+    .replace(/[\r\n\t]+/g, " ")
+    .slice(0, 500);
+}
+
+app.use((error, req, res, next) => {
+  console.error("Erro interno ao processar requisição.", {
+    stage: error?.stage || "http_request",
+    name: error?.name || "Error",
+    code: error?.code ?? null,
+    status: error?.status ?? error?.statusCode ?? null,
+    message: sanitizeErrorMessage(error),
+  });
 
   res.status(500).json({
     error: "Erro interno do servidor.",
