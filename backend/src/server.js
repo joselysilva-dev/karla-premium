@@ -4,10 +4,13 @@ import express from "express";
 import cors from "cors";
 
 import chatRoutes from "./routes/chatRoutes.js";
+import healthRoutes from "./routes/healthRoutes.js";
 
 const requiredEnvironmentVariables = [
   "GEMINI_API_KEY",
   "FRONTEND_URL",
+  "SUPABASE_URL",
+  "SUPABASE_SECRET_KEY",
 ];
 
 const missingEnvironmentVariables = requiredEnvironmentVariables.filter(
@@ -53,6 +56,7 @@ app.use(
 app.use(express.json({ limit: "20kb" }));
 
 app.use("/api", chatRoutes);
+app.use("/api", healthRoutes);
 
 app.get("/api/health", (req, res) => {
   res.json({

@@ -18,6 +18,8 @@ Copie `.env.example` para `.env` e preencha as variáveis necessárias. O arquiv
 - `ALLOWED_ORIGINS`: origens adicionais autorizadas pelo CORS, separadas por vírgulas (opcional). Exemplo: `http://localhost:5173,https://preview.example.com`.
 - `PORT`: porta HTTP do servidor (opcional; padrão `3001`).
 - `NODE_ENV`: use `production` no ambiente de produção.
+- `SUPABASE_URL`: URL do projeto Supabase (obrigatória).
+- `SUPABASE_SECRET_KEY`: chave secreta do Supabase, usada somente no backend (obrigatória). Nunca exponha esta chave no frontend.
 
 As origens são comparadas sem barras finais. Requisições sem o cabeçalho `Origin`, como health checks, também são aceitas. Não use `*` nessas variáveis.
 
@@ -48,6 +50,10 @@ Retorna o estado da API:
 }
 ```
 
+### `GET /api/health/database`
+
+Verifica se o backend consegue consultar o Supabase. Em caso de sucesso, retorna HTTP `200` com `database: "connected"`. Se a conexão ou consulta falhar, retorna HTTP `503` com `database: "unavailable"`, sem expor detalhes do provedor.
+
 ### `POST /api/chat`
 
 Recebe uma mensagem e o histórico opcional da conversa:
@@ -67,3 +73,7 @@ Resposta de sucesso:
   "response": "Resposta da Karla"
 }
 ```
+
+## Banco de dados
+
+A migration inicial está em `../supabase/migrations/202608050001_initial_schema.sql`. Aplique-a pelo Supabase CLI ou pelo SQL Editor antes de usar o health check. Ela cria as tabelas, índices, triggers, RLS e policies da aplicação.

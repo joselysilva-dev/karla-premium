@@ -1,5 +1,14 @@
 # React + TypeScript + Vite
 
+## Supabase
+
+Copie `.env.example` para `.env.local` e configure:
+
+- `VITE_SUPABASE_URL`: URL do projeto Supabase.
+- `VITE_SUPABASE_PUBLISHABLE_KEY`: chave publicável do projeto. Nunca use `SUPABASE_SECRET_KEY` no frontend.
+
+O cliente compartilhado está disponível em `src/lib/supabase.ts`.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
