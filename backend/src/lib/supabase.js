@@ -7,8 +7,12 @@ export function getSupabaseClient() {
     return supabaseClient;
   }
 
-  const url = process.env.SUPABASE_URL?.trim();
-  const secretKey = process.env.SUPABASE_SECRET_KEY?.trim();
+  const url = process.env.SUPABASE_URL
+    ?.replace(/[\r\n]/g, "")
+    .trim();
+  const secretKey = process.env.SUPABASE_SECRET_KEY
+    ?.replace(/[\r\n]/g, "")
+    .trim();
 
   if (!url || !secretKey) {
     throw new Error(
