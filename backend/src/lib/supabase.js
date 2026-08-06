@@ -10,6 +10,7 @@ export function getSupabaseClient() {
   const url = process.env.SUPABASE_URL
     ?.replace(/[\r\n]/g, "")
     .trim();
+
   const secretKey = process.env.SUPABASE_SECRET_KEY
     ?.replace(/[\r\n]/g, "")
     .trim();
@@ -20,10 +21,17 @@ export function getSupabaseClient() {
     );
   }
 
+  console.log("SUPABASE_URL configurada:", url);
+  console.log(
+    "SUPABASE_SECRET_KEY prefixo:",
+    secretKey.substring(0, 15)
+  );
+
   supabaseClient = createClient(url, secretKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
+      detectSessionInUrl: false,
     },
   });
 
