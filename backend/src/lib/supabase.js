@@ -7,33 +7,29 @@ export function getSupabaseClient() {
     return supabaseClient;
   }
 
-  const url = process.env.SUPABASE_URL
-    ?.replace(/[\r\n]/g, "")
-    .trim();
+  const url = process.env.SUPABASE_URL?.replace(/[\r\n]/g, "");
+  const key = process.env.SUPABASE_SECRET_KEY?.replace(/[\r\n]/g, "");
 
-  const secretKey = process.env.SUPABASE_SECRET_KEY
-    ?.replace(/[\r\n]/g, "")
-    .trim();
-
-  if (!url || !secretKey) {
-    throw new Error(
-      "Supabase não configurado: defina SUPABASE_URL e SUPABASE_SECRET_KEY."
-    );
+  if (!url) {
+    throw new Error("SUPABASE_URL não configurada.");
   }
 
-  console.log("SUPABASE_URL configurada:", url);
-  console.log(
-    "SUPABASE_SECRET_KEY prefixo:",
-    secretKey.substring(0, 15)
-  );
+  if (!key) {
+    throw new Error("SUPABASE_SECRET_KEY não configurada.");
+  }
 
-  supabaseClient = createClient(url, secretKey, {
+  supabaseClient = createClient(url, key, {
     auth: {
-      autoRefreshToken: false,
       persistSession: false,
       detectSessionInUrl: false,
     },
   });
+
+  // ===== LOGS TEMPORÁRIOS =====
+  console.log("URL:", process.env.SUPABASE_URL);
+  console.log("KEY EXISTS:", !!process.env.SUPABASE_SECRET_KEY);
+  console.log("CLIENT:", typeof supabaseClient);
+  // ============================
 
   return supabaseClient;
 }
