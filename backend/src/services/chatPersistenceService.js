@@ -8,6 +8,16 @@ function hashVisitorId(visitorId) {
   return createHash("sha256").update(visitorId).digest("hex");
 }
 
+function requireVisitorId(visitorId) {
+  if (!validVisitorId(visitorId)) {
+    const error = new Error("Identificador de visitante inválido.");
+    error.status = 400;
+    error.safeMessage = error.message;
+    throw error;
+  }
+  return hashVisitorId(visitorId);
+}
+
 function validVisitorId(value) {
   return typeof value === "string" && UUID_PATTERN.test(value);
 }
@@ -122,4 +132,58 @@ export async function touchClient(supabase, clientId) {
     .update({ last_contact_at: new Date().toISOString() })
     .eq("id", clientId);
   if (error) throw error;
+}
+
+export async function listVisitorConversations(visitorId) {
+  const visitorIdHash = requireVisitorId(visitorId);
+  const { data, error } = await getSupabaseClient()
+    .from("conversations")
+    .select("id, client_id, title, status, created_at, updated_at")
+    .eq("visitor_id_hash", visitorIdHash)
+    .order("updated_at", { ascending: false })
+    .limit(50);
+
+  if (error) throw error;
+  return data || [];
+}
+
+export async function getVisitorConversationHistory(visitorId, conversationId) {
+  const visitorIdHash = requireVisitorId(visitorId);
+  if (!validUuid(conversationId)) {
+    const error = new Error("Identificador de conversa inválido.");
+    error.status = 400;
+    error.safeMessage = error.message;
+    throw error;
+  }
+
+  const supabase = getSupabaseClient();
+  const { data: conversation, error: conversationError } = await supabase
+    .from("conversations")
+    .select("id")
+    .eq("id", conversationId)
+    .eq("visitor_id_hash", visitorIdHash)
+    .maybeSingle();
+
+  if (conversationError) throw conversationError;
+  if (!conversation) {
+    const error = new Error("Conversa não encontrada.");
+    error.status = 404;
+    error.safeMessage = error.message;
+    throw error;
+  }
+
+  const { data, error } = await supabase
+    .from("messages")
+    .select("role, content, created_at")
+    .eq("conversation_id", conversationId)
+    .in("role", ["user", "assistant"])
+    .order("created_at", { ascending: true })
+    .limit(500);
+
+  if (error) throw error;
+  return (data || []).map(({ role, content, created_at }) => ({
+    role,
+    conteudo: content,
+    created_at,
+  }));
 }
