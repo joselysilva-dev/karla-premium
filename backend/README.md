@@ -65,6 +65,16 @@ Recebe uma mensagem e o histórico opcional da conversa:
 }
 ```
 
+O backend persiste a conversa no Supabase e devolve também `visitorId` e
+`conversationId`. O frontend deve reutilizar esses identificadores nas mensagens
+seguintes para manter a memória da sessão.
+
+## Administração
+
+As rotas sob `/api/admin` exigem um access token Supabase de um profile com
+`role = 'admin'`. Consulte [`../docs/PHASE_4_ADMIN_AUTH.md`](../docs/PHASE_4_ADMIN_AUTH.md)
+para endpoints, segurança, migration e criação do primeiro administrador.
+
 Resposta de sucesso:
 
 ```json

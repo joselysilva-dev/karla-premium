@@ -1,8 +1,28 @@
 import { chatWithKarla } from "../services/geminiService.js";
+import {
+  getOrCreateChatContext,
+  loadRecentHistory,
+  saveChatMessage,
+  touchClient,
+} from "../services/chatPersistenceService.js";
 
-export async function chatController(req, res, next) {
+export function createChatController(dependencies = {}) {
+  const {
+    createContext = getOrCreateChatContext,
+    loadHistory = loadRecentHistory,
+    saveMessage = saveChatMessage,
+    updateClientContact = touchClient,
+    generateReply = chatWithKarla,
+  } = dependencies;
+
+  return async function chatControllerHandler(req, res, next) {
   try {
-    const { message, history = [] } = req.body;
+    const {
+      message,
+      visitorId,
+      conversationId,
+      contact = {},
+    } = req.body;
 
     if (typeof message !== "string" || !message.trim()) {
       return res.status(400).json({
@@ -10,28 +30,49 @@ export async function chatController(req, res, next) {
       });
     }
 
-    const historyIsValid =
-      Array.isArray(history) &&
-      history.every(
-        (item) =>
-          item &&
-          (item.role === "user" || item.role === "assistant") &&
-          typeof item.content === "string"
-      );
-
-    if (!historyIsValid) {
+    if (!contact || typeof contact !== "object" || Array.isArray(contact)) {
       return res.status(400).json({
-        error: "O histórico da conversa é inválido.",
+        error: "Os dados de contato são inválidos.",
       });
     }
 
-    const resposta = await chatWithKarla(message.trim(), history);
+    const context = await createContext({
+      visitorId,
+      conversationId,
+      contact,
+    });
+    const history = await loadHistory(
+      context.supabase,
+      context.conversation.id
+    );
+
+    await saveMessage(
+      context.supabase,
+      context.conversation.id,
+      "user",
+      message.trim()
+    );
+
+    const resposta = await generateReply(message.trim(), history);
+
+    await saveMessage(
+      context.supabase,
+      context.conversation.id,
+      "assistant",
+      resposta
+    );
+    await updateClientContact(context.supabase, context.client.id);
 
     return res.status(200).json({
       success: true,
       response: resposta,
+      visitorId: context.visitorId,
+      conversationId: context.conversation.id,
     });
   } catch (error) {
     next(error);
   }
+  };
 }
+
+export const chatController = createChatController();
