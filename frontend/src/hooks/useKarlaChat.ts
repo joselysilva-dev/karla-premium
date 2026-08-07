@@ -1,8 +1,5 @@
 import { useCallback, useState } from 'react'
-import {
-  sendMessage,
-  type ChatHistoryMessage,
-} from '../services/api'
+import { sendMessage } from '../services/api'
 import type { ChatMessage } from '../types/chat'
 
 const createId = () =>
@@ -17,19 +14,6 @@ export function useKarlaChat() {
       const message = content.trim()
 
       if (!message || isLoading) return
-
-      // Histórico existente antes da nova mensagem.
-      // Mensagens de erro não são enviadas ao Gemini.
-      const history: ChatHistoryMessage[] = messages
-        .filter(
-          (item) =>
-            item.role === 'user' ||
-            item.role === 'assistant'
-        )
-        .map((item) => ({
-          role: item.role as 'user' | 'assistant',
-          content: item.content,
-        }))
 
       const userMessage: ChatMessage = {
         id: createId(),
@@ -47,10 +31,7 @@ export function useKarlaChat() {
 
       try {
         // Envia a mensagem atual + histórico anterior.
-        const response = await sendMessage(
-          message,
-          history
-        )
+        const response = await sendMessage(message)
 
         const assistantMessage: ChatMessage = {
           id: createId(),
@@ -81,7 +62,7 @@ export function useKarlaChat() {
         setIsLoading(false)
       }
     },
-    [isLoading, messages]
+    [isLoading]
   )
 
   return {

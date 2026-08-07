@@ -8,8 +8,13 @@ import Feedbacks from './components/sections/Feedbacks'
 import Contact from './components/sections/Contact'
 import AiAssistant from './components/sections/AiAssistant'
 import Footer from './components/sections/Footer'
+import AdminApp from './features/admin/AdminApp'
 
 function App() {
+  if (window.location.pathname.startsWith('/admin')) {
+    return <AdminApp />
+  }
+
   return (
     <div className="kk-app">
       <Navbar />

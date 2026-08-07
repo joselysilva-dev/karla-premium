@@ -82,3 +82,19 @@ export default defineConfig([
 ])
 
 ```
+# Karla Premium — frontend
+
+Além da landing pública, o frontend oferece `/admin/login` e `/admin` para
+usuários administrativos autenticados pelo Supabase Auth.
+
+Variáveis obrigatórias:
+
+```text
+VITE_API_URL
+VITE_SUPABASE_URL
+VITE_SUPABASE_PUBLISHABLE_KEY
+```
+
+Nunca use uma secret key em variável `VITE_*`. Consulte
+[`../docs/PHASE_4_ADMIN_AUTH.md`](../docs/PHASE_4_ADMIN_AUTH.md) para a operação
+completa.
