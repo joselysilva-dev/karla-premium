@@ -9,11 +9,29 @@ import Contact from './components/sections/Contact'
 import AiAssistant from './components/sections/AiAssistant'
 import Footer from './components/sections/Footer'
 import AdminApp from './features/admin/AdminApp'
+import { AccountPage } from './features/auth/AccountPage'
+import { AuthPage } from './features/auth/AuthPage'
+import { ProtectedRoute } from './features/auth/ProtectedRoute'
+import { useAuth } from './hooks/useAuth'
 
 function App() {
-  if (window.location.pathname.startsWith('/admin')) {
+  const { loading, session } = useAuth()
+  const path = window.location.pathname.replace(/\/+$/, '') || '/'
+
+  if (loading) {
+    return <main className="auth-page"><p className="auth-loading">Carregando sessão…</p></main>
+  }
+
+  if (!session) {
+    if (path === '/cadastro') return <AuthPage mode="signup" />
+    if (path === '/recuperar-senha') return <AuthPage mode="recovery" />
+    return <AuthPage mode="login" />
+  }
+
+  if (path.startsWith('/admin')) {
     return <AdminApp />
   }
+  if (path === '/conta') return <ProtectedRoute><AccountPage /></ProtectedRoute>
 
   return (
     <div className="kk-app">

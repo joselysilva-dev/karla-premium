@@ -98,3 +98,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY
 Nunca use uma secret key em variável `VITE_*`. Consulte
 [`../docs/PHASE_4_ADMIN_AUTH.md`](../docs/PHASE_4_ADMIN_AUTH.md) para a operação
 completa.
+
+As rotas `/login`, `/cadastro`, `/recuperar-senha` e `/conta` usam Supabase Auth.
+Consulte [`../docs/PHASE_5_CLIENT_AUTH.md`](../docs/PHASE_5_CLIENT_AUTH.md) para
+redirect URLs, migration e validação manual.

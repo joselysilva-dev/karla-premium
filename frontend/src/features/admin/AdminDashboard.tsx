@@ -38,20 +38,27 @@ function ClientTable({ clients, onSelect }: { clients: Client[]; onSelect?: (cli
   </tbody></table></div>
 }
 
-function ClientsView() {
+function ClientsView({ initialClientId }: { initialClientId?: string | null }) {
   const [clients, setClients] = useState<Client[]>([]); const [search, setSearch] = useState(''); const [selected, setSelected] = useState<Client | null>(null)
   const [loading, setLoading] = useState(true); const [error, setError] = useState(''); const [saved, setSaved] = useState(false)
   const load = useCallback(async () => { setLoading(true); setError(''); try { setClients((await adminApi.clients(search)).data) } catch (e) { setError((e as Error).message) } finally { setLoading(false) } }, [search])
   useEffect(() => { const timer = window.setTimeout(() => void load(), 250); return () => window.clearTimeout(timer) }, [load])
+  useEffect(() => {
+    if (!initialClientId || !clients.length || selected) return
+    void adminApi.client(initialClientId).then(setSelected).catch((e: Error) => setError(e.message))
+  }, [clients, initialClientId, selected])
+  async function openClient(client: Client) { try { setSelected(await adminApi.client(client.id)); window.history.pushState({}, '', `/admin/clientes/${client.id}`) } catch (e) { setError((e as Error).message) } }
   async function save() { if (!selected) return; setSaved(false); try { const updated = await adminApi.updateClient(selected.id, selected); setSelected(updated); setClients((all) => all.map((item) => item.id === updated.id ? updated : item)); setSaved(true) } catch (e) { setError((e as Error).message) } }
   return <section><div className="admin-heading"><div><small>Relacionamento</small><h1>Clientes</h1></div><input aria-label="Pesquisar clientes" placeholder="Pesquisar nome, e-mail ou telefone" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
-    <State loading={loading} error={error} empty={!loading && !clients.length} />{!loading && <div className="admin-card"><ClientTable clients={clients} onSelect={setSelected} /></div>}
-    {selected && <div className="admin-modal" role="dialog" aria-modal="true" aria-label="Editar cliente"><div className="admin-modal__card"><button className="close" onClick={() => setSelected(null)} aria-label="Fechar">×</button><h2>Dados do cliente</h2>
+    <State loading={loading} error={error} empty={!loading && !clients.length} />{!loading && <div className="admin-card"><ClientTable clients={clients} onSelect={(client) => void openClient(client)} /></div>}
+    {selected && <div className="admin-modal" role="dialog" aria-modal="true" aria-label="Editar cliente"><div className="admin-modal__card"><button className="close" onClick={() => { window.history.pushState({}, '', '/admin/clientes'); setSelected(null) }} aria-label="Fechar">×</button><h2>Dados do cliente</h2>
       <label>Nome<input value={selected.name} onChange={(e) => setSelected({ ...selected, name: e.target.value })} /></label>
       <label>E-mail<input type="email" value={selected.email || ''} onChange={(e) => setSelected({ ...selected, email: e.target.value })} /></label>
       <label>Telefone<input value={selected.phone || ''} onChange={(e) => setSelected({ ...selected, phone: e.target.value })} /></label>
       <label>Notas<textarea rows={5} value={selected.notes || ''} onChange={(e) => setSelected({ ...selected, notes: e.target.value })} /></label>
       <label className="check"><input type="checkbox" checked={selected.is_active} onChange={(e) => setSelected({ ...selected, is_active: e.target.checked })} /> Atendimento ativo</label>
+      {selected.profile && <div><h3>Perfil do aluno</h3>{Object.entries(selected.profile).map(([key, value]) => <p key={key}><strong>{key}:</strong> {value || '—'}</p>)}</div>}
+      <a href={`/admin/conversas?clientId=${selected.id}`}>Ver conversas deste cliente</a>
       {saved && <p className="admin-alert success">Alterações salvas.</p>}<button onClick={() => void save()}>Salvar alterações</button></div></div>}
   </section>
 }
@@ -59,7 +66,7 @@ function ClientsView() {
 function ConversationsView() {
   const [items, setItems] = useState<Conversation[]>([]); const [detail, setDetail] = useState<Awaited<ReturnType<typeof adminApi.conversation>> | null>(null)
   const [loading, setLoading] = useState(true); const [error, setError] = useState('')
-  useEffect(() => { void adminApi.conversations().then((r) => setItems(r.data)).catch((e: Error) => setError(e.message)).finally(() => setLoading(false)) }, [])
+  useEffect(() => { const clientId = new URLSearchParams(window.location.search).get('clientId') || ''; void adminApi.conversations(clientId).then((r) => setItems(r.data)).catch((e: Error) => setError(e.message)).finally(() => setLoading(false)) }, [])
   async function open(id: string) { try { setDetail(await adminApi.conversation(id)) } catch (e) { setError((e as Error).message) } }
   return <section><div className="admin-heading"><div><small>Atendimentos</small><h1>Conversas</h1></div></div><State loading={loading} error={error} empty={!loading && !items.length} />
     {!loading && items.length > 0 && <div className="admin-card admin-list">{items.map((item) => <button key={item.id} onClick={() => void open(item.id)}><div><strong>{item.client?.name || 'Visitante'}</strong><span>{item.title || 'Conversa'}</span></div><div><span>{item.messages?.[0]?.count || 0} mensagens</span><small>{date(item.updated_at)}</small></div></button>)}</div>}
@@ -76,8 +83,8 @@ function SettingsView() {
   return <section><div className="admin-heading"><div><small>Conteúdo público</small><h1>Configurações do site</h1></div></div><State loading={loading} error={error} />{!loading && <div className="admin-card admin-form"><p>Informe valores em JSON. Exemplo: <code>{'{"url":"https://..."}'}</code></p>{visible.map((row) => <label key={row.id}>{row.id}<textarea rows={4} defaultValue={JSON.stringify(row.value, null, 2)} onBlur={(e) => change(row.id, e.target.value)} /></label>)}{saved && <p className="admin-alert success">Configurações salvas.</p>}<button onClick={() => void save()}>Salvar configurações</button></div>}</section>
 }
 
-export function AdminDashboard({ section }: { section: AdminSection }) {
-  if (section === 'clients') return <ClientsView />
+export function AdminDashboard({ section, initialClientId }: { section: AdminSection; initialClientId?: string | null }) {
+  if (section === 'clients') return <ClientsView initialClientId={initialClientId} />
   if (section === 'conversations') return <ConversationsView />
   if (section === 'settings') return <SettingsView />
   return <DashboardView />

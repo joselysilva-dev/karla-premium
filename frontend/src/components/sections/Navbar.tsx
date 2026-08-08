@@ -6,6 +6,7 @@ import {
   ButtonLink,
   Container,
 } from '../ui'
+import { useAuth } from '../../hooks/useAuth'
 
 const navLinks = [
   { label: 'Início', href: '#inicio' },
@@ -16,6 +17,7 @@ const navLinks = [
 ]
 
 function Navbar() {
+  const { signOut } = useAuth()
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] =
     useState(false)
@@ -68,12 +70,29 @@ function Navbar() {
 
           <div className="kk-nav__actions">
             <ButtonLink
+              href="/conta"
+              size="small"
+              className="kk-nav__account"
+            >
+              Minha conta
+            </ButtonLink>
+
+            <ButtonLink
               href="#contato"
               size="small"
               className="kk-nav__cta"
             >
               Falar com a Karla
             </ButtonLink>
+
+            <Button
+              variant="ghost"
+              size="small"
+              className="kk-nav__logout"
+              onClick={() => void signOut()}
+            >
+              Sair
+            </Button>
 
             <Button
               className="kk-nav__menu-toggle"
@@ -128,6 +147,18 @@ function Navbar() {
               >
                 Falar com a Karla
               </ButtonLink>
+
+              <ButtonLink href="/conta" fullWidth onClick={closeMenu}>
+                Minha conta
+              </ButtonLink>
+
+              <Button
+                variant="ghost"
+                fullWidth
+                onClick={() => void signOut()}
+              >
+                Sair
+              </Button>
             </nav>
           </Container>
         </div>

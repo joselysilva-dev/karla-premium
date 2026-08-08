@@ -9,12 +9,22 @@ import './admin.css'
 
 export type AdminSection = 'dashboard' | 'clients' | 'conversations' | 'settings'
 
+function routeState() {
+  const parts = window.location.pathname.split('/').filter(Boolean)
+  if (parts[1] === 'clientes') return { section: 'clients' as const, clientId: parts[2] || null }
+  if (parts[1] === 'conversas') return { section: 'conversations' as const, clientId: null }
+  if (parts[1] === 'configuracoes') return { section: 'settings' as const, clientId: null }
+  return { section: 'dashboard' as const, clientId: null }
+}
+
 export default function AdminApp() {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
   const [authorized, setAuthorized] = useState(false)
   const [recovery, setRecovery] = useState(false)
-  const [section, setSection] = useState<AdminSection>('dashboard')
+  const initialRoute = routeState()
+  const [section, setSection] = useState<AdminSection>(initialRoute.section)
+  const [clientId, setClientId] = useState<string | null>(initialRoute.clientId)
 
   useEffect(() => {
     void supabase.auth.getSession().then(({ data }) => {
@@ -48,13 +58,20 @@ export default function AdminApp() {
     ['settings', 'Configurações', Settings],
   ]
 
+  function navigate(next: AdminSection) {
+    const paths: Record<AdminSection, string> = { dashboard: '/admin', clients: '/admin/clientes', conversations: '/admin/conversas', settings: '/admin/configuracoes' }
+    window.history.pushState({}, '', paths[next])
+    setClientId(null)
+    setSection(next)
+  }
+
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
         <a className="admin-brand" href="/">Karla <span>Premium</span></a>
         <nav aria-label="Administração">
           {items.map(([id, label, Icon]) => (
-            <button key={id} className={section === id ? 'active' : ''} onClick={() => setSection(id)}>
+            <button key={id} className={section === id ? 'active' : ''} onClick={() => navigate(id)}>
               <Icon size={18} /> {label}
             </button>
           ))}
@@ -67,7 +84,7 @@ export default function AdminApp() {
         <header className="admin-topbar">
           <div><small>Painel administrativo</small><strong>{session.user.email}</strong></div>
         </header>
-        <AdminDashboard section={section} />
+        <AdminDashboard section={section} initialClientId={clientId} />
       </main>
     </div>
   )

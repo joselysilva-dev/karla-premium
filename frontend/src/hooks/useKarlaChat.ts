@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react'
-import { sendMessage } from '../services/api'
+import { useCallback, useEffect, useState } from 'react'
+import { loadLatestChatHistory, sendMessage } from '../services/api'
 import type { ChatMessage } from '../types/chat'
 
 const createId = () =>
@@ -8,6 +8,23 @@ const createId = () =>
 export function useKarlaChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isInitializing, setIsInitializing] = useState(true)
+
+  useEffect(() => {
+    let active = true
+    void loadLatestChatHistory()
+      .then((history) => {
+        if (!active) return
+        setMessages(history.map((item, index) => ({
+          id: `${item.created_at}-${index}`,
+          role: item.role,
+          content: item.conteudo,
+        })))
+      })
+      .catch((error) => console.error('Erro ao carregar histórico:', error))
+      .finally(() => { if (active) setIsInitializing(false) })
+    return () => { active = false }
+  }, [])
 
   const send = useCallback(
     async (content: string) => {
@@ -67,7 +84,7 @@ export function useKarlaChat() {
 
   return {
     messages,
-    isLoading,
+    isLoading: isLoading || isInitializing,
     send,
   }
 }

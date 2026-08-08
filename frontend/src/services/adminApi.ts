@@ -29,6 +29,7 @@ export type Client = {
   is_active: boolean
   last_contact_at: string | null
   created_at: string
+  profile?: Record<string, string | number | null> | null
 }
 
 export type Conversation = {
@@ -49,6 +50,7 @@ export const adminApi = {
   me: () => adminRequest<{ id: string; email: string; fullName: string | null; role: 'admin' }>('/me'),
   dashboard: () => adminRequest<{ counts: { clients: number; conversations: number; messages: number }; recentContacts: Client[]; api: string; database: string }>('/dashboard'),
   clients: (search = '') => adminRequest<{ data: Client[]; pagination: { total: number } }>(`/clients?limit=50&search=${encodeURIComponent(search)}`),
+  client: (id: string) => adminRequest<Client>(`/clients/${id}`),
   updateClient: (id: string, values: Partial<Client>) => adminRequest<Client>(`/clients/${id}`, { method: 'PATCH', body: JSON.stringify(values) }),
   conversations: (clientId = '') => adminRequest<{ data: Conversation[]; pagination: { total: number } }>(`/conversations?limit=50${clientId ? `&clientId=${encodeURIComponent(clientId)}` : ''}`),
   conversation: (id: string) => adminRequest<ConversationDetail>(`/conversations/${id}`),
