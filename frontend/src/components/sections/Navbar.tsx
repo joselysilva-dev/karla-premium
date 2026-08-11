@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   BrandLogo,
   Button,
@@ -19,6 +19,7 @@ const navLinks = [
 
 function Navbar() {
   const { signOut } = useAuth()
+  const navigate = useNavigate()
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] =
     useState(false)
@@ -39,6 +40,12 @@ function Navbar() {
 
   const closeMenu = () => {
     setMobileMenuOpen(false)
+  }
+
+  const handleSignOut = async () => {
+    await signOut()
+    setMobileMenuOpen(false)
+    navigate('/login', { replace: true })
   }
 
   return (
@@ -89,7 +96,7 @@ function Navbar() {
               variant="ghost"
               size="small"
               className="kk-nav__logout"
-              onClick={() => void signOut()}
+              onClick={() => void handleSignOut()}
             >
               Sair
             </Button>
@@ -159,7 +166,7 @@ function Navbar() {
               <Button
                 variant="ghost"
                 fullWidth
-                onClick={() => void signOut()}
+                onClick={() => void handleSignOut()}
               >
                 Sair
               </Button>

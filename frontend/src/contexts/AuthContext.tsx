@@ -113,7 +113,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) throw error
       return Boolean(data.session)
     },
-    async signOut() { const { error } = await supabase.auth.signOut(); if (error) throw error },
+    async signOut() {
+      const { error } = await supabase.auth.signOut()
+      if (error) throw error
+      claimedUser.current = null
+      setPasswordRecovery(false)
+      setSession(null)
+    },
     async sendPasswordReset(email) {
       const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/recuperar-senha` })
       if (error) throw error

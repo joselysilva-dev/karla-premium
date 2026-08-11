@@ -1,6 +1,8 @@
 import type { Session } from '@supabase/supabase-js'
 import { BarChart3, LogOut, MessageSquareText, Settings, Users } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { adminApi } from '../../services/adminApi'
 import { AdminDashboard } from './AdminDashboard'
@@ -18,6 +20,8 @@ function routeState() {
 }
 
 export default function AdminApp() {
+  const { signOut } = useAuth()
+  const navigateTo = useNavigate()
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
   const [authorized, setAuthorized] = useState(false)
@@ -58,6 +62,11 @@ export default function AdminApp() {
     ['settings', 'Configurações', Settings],
   ]
 
+  async function handleSignOut() {
+    await signOut()
+    navigateTo('/login', { replace: true })
+  }
+
   function navigate(next: AdminSection) {
     const paths: Record<AdminSection, string> = { dashboard: '/admin', clients: '/admin/clientes', conversations: '/admin/conversas', settings: '/admin/configuracoes' }
     window.history.pushState({}, '', paths[next])
@@ -76,7 +85,7 @@ export default function AdminApp() {
             </button>
           ))}
         </nav>
-        <button className="admin-signout" onClick={() => void supabase.auth.signOut()}>
+        <button className="admin-signout" onClick={() => void handleSignOut()}>
           <LogOut size={18} /> Sair
         </button>
       </aside>

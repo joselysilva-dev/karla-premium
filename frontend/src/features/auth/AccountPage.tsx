@@ -4,7 +4,12 @@ import { useAuth } from '../../hooks/useAuth'
 import './auth.css'
 
 const accountAreas = [
-  { label: 'Meus Treinos', icon: Dumbbell },
+  {
+    label: 'Meus Treinos',
+    icon: Dumbbell,
+    description: 'Acesse seus treinos personalizados pelo aplicativo oficial da Karla.',
+    href: 'https://play.google.com/store/apps/details?id=br.com.wiki4fit.karlakarolynne',
+  },
   { label: 'Avaliações', icon: Activity },
   { label: 'Evolução', icon: ChartNoAxesCombined },
   { label: 'Alimentação', icon: Apple },
@@ -36,7 +41,18 @@ export function AccountPage() {
           <div><small>Área do aluno</small><h1 id="account-title">Olá, {name}</h1>{user?.email && <p>{user.email}</p>}</div>
         </div>
         <div className="account-shortcuts" aria-label="Áreas da conta">
-          {accountAreas.map(({ label, icon: Icon }) => <article className="account-shortcut" key={label}><Icon aria-hidden="true" /><span>{label}</span><small>Em breve</small></article>)}
+          {accountAreas.map(({ label, icon: Icon, description, href }) => (
+            <article className={`account-shortcut${href ? ' account-shortcut--active' : ''}`} key={label}>
+              <Icon aria-hidden="true" />
+              <span>{label}</span>
+              {description ? <p>{description}</p> : <small>Em breve</small>}
+              {href && (
+                <a href={href} target="_blank" rel="noopener noreferrer">
+                  Abrir app de treinos
+                </a>
+              )}
+            </article>
+          ))}
         </div>
       </section>
     </main>
