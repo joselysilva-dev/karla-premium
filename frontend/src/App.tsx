@@ -1,3 +1,4 @@
+import { Navigate, Route, Routes } from 'react-router-dom'
 import Navbar from './components/sections/Navbar'
 import Hero from './components/sections/Hero'
 import About from './components/sections/About'
@@ -14,43 +15,35 @@ import { AuthPage } from './features/auth/AuthPage'
 import { ProtectedRoute } from './features/auth/ProtectedRoute'
 import { useAuth } from './hooks/useAuth'
 
-function App() {
-  const { loading, session } = useAuth()
-  const path = window.location.pathname.replace(/\/+$/, '') || '/'
-
-  if (loading) {
-    return <main className="auth-page"><p className="auth-loading">Carregando sessão…</p></main>
-  }
-
-  if (!session) {
-    if (path === '/cadastro') return <AuthPage mode="signup" />
-    if (path === '/recuperar-senha') return <AuthPage mode="recovery" />
-    return <AuthPage mode="login" />
-  }
-
-  if (path.startsWith('/admin')) {
-    return <AdminApp />
-  }
-  if (path === '/conta') return <ProtectedRoute><AccountPage /></ProtectedRoute>
-
+function LandingPage() {
   return (
     <div className="kk-app">
       <Navbar />
-
-      <main>
-        <Hero />
-
-        <About />
-        <Services />
-        <HowItWorks />
-        <Results />
-        <Feedbacks />
-        <Contact />
-      </main>
-
+      <main><Hero /><About /><Services /><HowItWorks /><Results /><Feedbacks /><Contact /></main>
       <Footer />
       <AiAssistant />
     </div>
+  )
+}
+
+function App() {
+  const { loading, session } = useAuth()
+
+  if (loading) return <main className="auth-page"><p className="auth-loading">Carregando sessão…</p></main>
+
+  return (
+    <Routes>
+      <Route path="/login" element={session ? <Navigate to="/" replace /> : <AuthPage mode="login" />} />
+      <Route path="/cadastro" element={session ? <Navigate to="/" replace /> : <AuthPage mode="signup" />} />
+      <Route path="/recuperar-senha" element={<AuthPage mode="recovery" />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/minha-conta" element={<AccountPage />} />
+        <Route path="/conta" element={<Navigate to="/minha-conta" replace />} />
+        <Route path="/admin/*" element={<AdminApp />} />
+      </Route>
+      <Route path="/" element={session ? <LandingPage /> : <AuthPage mode="login" />} />
+      <Route path="*" element={<Navigate to={session ? '/' : '/login'} replace />} />
+    </Routes>
   )
 }
 

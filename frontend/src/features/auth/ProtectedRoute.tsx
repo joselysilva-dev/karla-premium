@@ -1,9 +1,11 @@
-import type { ReactNode } from 'react'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 
-export function ProtectedRoute({ children }: { children: ReactNode }) {
+export function ProtectedRoute() {
   const { loading, session } = useAuth()
-  if (loading) return <main className="auth-page"><p>Carregando sessão…</p></main>
-  if (!session) { window.location.replace('/login'); return null }
-  return children
+  const location = useLocation()
+
+  if (loading) return <main className="auth-page"><p className="auth-loading">Carregando sessão…</p></main>
+  if (!session) return <Navigate to="/login" replace state={{ from: location }} />
+  return <Outlet />
 }

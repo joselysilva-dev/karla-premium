@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import {
   BrandLogo,
   Button,
@@ -69,13 +70,12 @@ function Navbar() {
           </nav>
 
           <div className="kk-nav__actions">
-            <ButtonLink
-              href="/conta"
-              size="small"
-              className="kk-nav__account"
+            <Link
+              to="/minha-conta"
+              className="kk-button kk-button--primary kk-button--small kk-nav__account"
             >
               Minha conta
-            </ButtonLink>
+            </Link>
 
             <ButtonLink
               href="#contato"
@@ -148,9 +148,13 @@ function Navbar() {
                 Falar com a Karla
               </ButtonLink>
 
-              <ButtonLink href="/conta" fullWidth onClick={closeMenu}>
+              <Link
+                to="/minha-conta"
+                className="kk-button kk-button--primary kk-button--full"
+                onClick={closeMenu}
+              >
                 Minha conta
-              </ButtonLink>
+              </Link>
 
               <Button
                 variant="ghost"
