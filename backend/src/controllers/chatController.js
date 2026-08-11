@@ -2,6 +2,7 @@ import { chatWithKarla } from "../services/geminiService.js";
 import {
   getOrCreateChatContext,
   loadRecentHistory,
+  loadProfileMemory,
   saveChatMessage,
   touchClient,
 } from "../services/chatPersistenceService.js";
@@ -10,6 +11,7 @@ export function createChatController(dependencies = {}) {
   const {
     createContext = getOrCreateChatContext,
     loadHistory = loadRecentHistory,
+    loadMemory = loadProfileMemory,
     saveMessage = saveChatMessage,
     updateClientContact = touchClient,
     generateReply = chatWithKarla,
@@ -40,11 +42,19 @@ export function createChatController(dependencies = {}) {
       visitorId,
       conversationId,
       contact,
+      userId: req.user?.id,
     });
     const history = await loadHistory(
       context.supabase,
       context.conversation.id
     );
+    const profile = await loadMemory(req.user?.id);
+    const personalizedHistory = profile
+      ? [{
+          role: "user",
+          content: `Contexto cadastral da aluna (use apenas para personalizar a resposta atual): ${JSON.stringify(profile)}`,
+        }, ...history]
+      : history;
 
     await saveMessage(
       context.supabase,
@@ -53,7 +63,7 @@ export function createChatController(dependencies = {}) {
       message.trim()
     );
 
-    const resposta = await generateReply(message.trim(), history);
+    const resposta = await generateReply(message.trim(), personalizedHistory);
 
     await saveMessage(
       context.supabase,

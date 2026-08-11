@@ -33,31 +33,56 @@ export function normalizeVisitorId(value) {
 export async function getOrCreateChatContext({
   visitorId,
   conversationId,
+  userId,
   contact = {},
 }) {
   const supabase = getSupabaseClient();
   const normalizedVisitorId = normalizeVisitorId(visitorId);
   const visitorIdHash = hashVisitorId(normalizedVisitorId);
 
-  let { data: client, error: clientError } = await supabase
+  let clientQuery = supabase
     .from("clients")
-    .select("id, name, email, phone, is_active")
-    .eq("visitor_id_hash", visitorIdHash)
-    .maybeSingle();
+    .select("id, name, email, phone, is_active, user_id");
+  clientQuery = userId
+    ? clientQuery.eq("user_id", userId)
+    : clientQuery.eq("visitor_id_hash", visitorIdHash);
+  let { data: client, error: clientError } = await clientQuery.maybeSingle();
 
   if (clientError) throw clientError;
+
+  if (!client && userId) {
+    const { data: visitorClient, error: visitorError } = await supabase
+      .from("clients")
+      .select("id")
+      .eq("visitor_id_hash", visitorIdHash)
+      .maybeSingle();
+    if (visitorError) throw visitorError;
+    if (visitorClient) {
+      const { error: claimError } = await supabase.rpc("claim_visitor_client", {
+        target_user_id: userId,
+        target_visitor_hash: visitorIdHash,
+      });
+      if (claimError) throw claimError;
+      const { data, error } = await supabase.from("clients")
+        .select("id, name, email, phone, is_active, user_id")
+        .eq("user_id", userId).maybeSingle();
+      if (error) throw error;
+      client = data;
+    }
+  }
 
   if (!client) {
     const { data, error } = await supabase
       .from("clients")
       .insert({
+        user_id: userId || null,
         visitor_id_hash: visitorIdHash,
         name: contact.name?.trim().slice(0, 120) || "Visitante do site",
         email: contact.email?.trim().slice(0, 254) || null,
         phone: contact.phone?.trim().slice(0, 40) || null,
         last_contact_at: new Date().toISOString(),
       })
-      .select("id, name, email, phone, is_active")
+      .select("id, name, email, phone, is_active, user_id")
       .single();
     if (error) throw error;
     client = data;
@@ -77,7 +102,7 @@ export async function getOrCreateChatContext({
       .select("id, status")
       .eq("id", conversationId)
       .eq("client_id", client.id)
-      .eq("visitor_id_hash", visitorIdHash)
+      .eq(userId ? "user_id" : "visitor_id_hash", userId || visitorIdHash)
       .maybeSingle();
     if (error) throw error;
     conversation = data;
@@ -87,6 +112,7 @@ export async function getOrCreateChatContext({
     const { data, error } = await supabase
       .from("conversations")
       .insert({
+        user_id: userId || null,
         client_id: client.id,
         visitor_id_hash: visitorIdHash,
         title: "Conversa pelo site",
@@ -132,6 +158,15 @@ export async function touchClient(supabase, clientId) {
     .update({ last_contact_at: new Date().toISOString() })
     .eq("id", clientId);
   if (error) throw error;
+}
+
+export async function loadProfileMemory(userId) {
+  if (!userId) return null;
+  const { data, error } = await getSupabaseClient().from("profiles")
+    .select("full_name, goal, height_cm, weight_kg, restrictions, injuries, experience_level")
+    .eq("id", userId).maybeSingle();
+  if (error) throw error;
+  return data;
 }
 
 export async function listVisitorConversations(visitorId) {

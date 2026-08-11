@@ -61,7 +61,7 @@ export async function listClients(req, res, next) {
 export async function getClient(req, res, next) {
   try {
     const { data, error } = await getSupabaseClient().from("clients")
-      .select("id, name, email, phone, notes, is_active, last_contact_at, created_at, updated_at")
+      .select("id, name, email, phone, notes, is_active, last_contact_at, created_at, updated_at, profile:profiles(full_name, email, phone, birth_date, gender, height_cm, weight_kg, goal, restrictions, injuries, experience_level, role)")
       .eq("id", req.params.id).maybeSingle();
     throwIfError(error);
     if (!data) return res.status(404).json({ error: "Cliente não encontrado." });

@@ -31,6 +31,25 @@ create index if not exists conversations_visitor_id_hash_idx
 create index if not exists messages_conversation_created_at_desc_idx
   on public.messages(conversation_id, created_at desc);
 
+create or replace function public.touch_conversation_on_message()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  update public.conversations
+  set updated_at = now()
+  where id = new.conversation_id;
+  return new;
+end;
+$$;
+
+drop trigger if exists messages_touch_conversation on public.messages;
+create trigger messages_touch_conversation
+after insert on public.messages
+for each row execute function public.touch_conversation_on_message();
+
 drop policy if exists "Users can update their profile" on public.profiles;
 
 revoke update on public.profiles from authenticated;

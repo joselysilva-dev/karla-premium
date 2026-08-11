@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { requireAdmin } from "../middleware/requireAdmin.js";
+import { requireAdmin, requireAdminAal2 } from "../middleware/requireAdmin.js";
 import {
   getClient,
   getConversation,
@@ -13,8 +13,8 @@ import {
 } from "../controllers/adminController.js";
 
 const router = Router();
-router.use(requireAdmin);
-router.get("/me", getCurrentAdmin);
+router.get("/me", requireAdmin, getCurrentAdmin);
+router.use(requireAdminAal2);
 router.get("/dashboard", getDashboard);
 router.get("/clients", listClients);
 router.get("/clients/:id", getClient);

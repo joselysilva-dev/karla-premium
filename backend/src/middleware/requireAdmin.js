@@ -1,50 +1,40 @@
 import { getSupabaseClient } from "../lib/supabase.js";
-
-function bearerToken(header = "") {
-  const match = header.match(/^Bearer\s+(.+)$/i);
-  return match?.[1]?.trim() || null;
-}
+import { authenticateToken, getBearerToken } from "./requireAuth.js";
 
 export function createRequireAdmin(getClient = getSupabaseClient) {
-  return async function requireAdminMiddleware(req, res, next) {
-  const token = bearerToken(req.headers.authorization);
-
-  if (!token) {
-    return res.status(401).json({ error: "Autenticação obrigatória." });
-  }
-
-  try {
-    const supabase = getClient();
-    const { data: authData, error: authError } =
-      await supabase.auth.getUser(token);
-
-    if (authError || !authData.user) {
-      return res.status(401).json({ error: "Sessão inválida ou expirada." });
+  return async function requireAdmin(req, res, next) {
+    try {
+      const user = await authenticateToken(
+        getBearerToken(req.headers.authorization),
+        getClient
+      );
+      if (!user) return res.status(401).json({ error: "Sessão inválida ou expirada." });
+      if (user.profile.role !== "admin") {
+        return res.status(403).json({ error: "Acesso restrito a administradores." });
+      }
+      req.user = user;
+      req.admin = user;
+      next();
+    } catch (error) {
+      error.stage = "admin_auth";
+      next(error);
     }
-
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("id, full_name, role")
-      .eq("id", authData.user.id)
-      .maybeSingle();
-
-    if (profileError) throw profileError;
-
-    if (profile?.role !== "admin") {
-      return res.status(403).json({ error: "Acesso restrito a administradores." });
-    }
-
-    req.admin = {
-      id: authData.user.id,
-      email: authData.user.email,
-      profile,
-    };
-    next();
-  } catch (error) {
-    error.stage = "admin_auth";
-    next(error);
-  }
   };
 }
 
 export const requireAdmin = createRequireAdmin();
+
+export function createRequireAdminAal2(getClient = getSupabaseClient) {
+  const requireRole = createRequireAdmin(getClient);
+  return async function requireAdminAal2(req, res, next) {
+    await requireRole(req, res, () => {
+      if (req.admin.aal !== "aal2") {
+        res.status(403).json({ error: "Autenticação multifator obrigatória para esta ação." });
+        return;
+      }
+      next();
+    });
+  };
+}
+
+export const requireAdminAal2 = createRequireAdminAal2();

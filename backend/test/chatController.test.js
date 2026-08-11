@@ -30,3 +30,37 @@ test("chat does not persist an assistant message when Gemini fails", async () =>
   await controller({ body: { message: "Olá" } }, response(), (error) => { forwarded = error; });
   assert.deepEqual(saved, ["user"]); assert.equal(forwarded.message, "provider failure");
 });
+
+test("authenticated chat uses profile memory without persisting it", async () => {
+  const saved = [];
+  const controller = createChatController({
+    createContext: async ({ userId }) => {
+      assert.equal(userId, "user-1");
+      return { supabase: {}, client: { id: "client" }, conversation: { id: "conversation" } };
+    },
+    loadHistory: async () => [{ role: "assistant", content: "Anterior" }],
+    loadMemory: async (userId) => {
+      assert.equal(userId, "user-1");
+      return { full_name: "Ana", goal: "Condicionamento", injuries: "Joelho" };
+    },
+    saveMessage: async (_client, _id, role, content) => saved.push({ role, content }),
+    updateClientContact: async () => {},
+    generateReply: async (_message, history) => {
+      assert.equal(history.length, 2);
+      assert.equal(history[0].role, "user");
+      assert.match(history[0].content, /Ana/);
+      assert.match(history[0].content, /Condicionamento/);
+      assert.equal(history[1].content, "Anterior");
+      return "Resposta personalizada";
+    },
+  });
+
+  const res = response();
+  await controller({ user: { id: "user-1" }, body: { message: "Monte meu treino" } }, res, assert.fail);
+
+  assert.equal(res.statusCode, 200);
+  assert.deepEqual(saved, [
+    { role: "user", content: "Monte meu treino" },
+    { role: "assistant", content: "Resposta personalizada" },
+  ]);
+});

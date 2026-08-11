@@ -10,7 +10,7 @@ import Contact from './components/sections/Contact'
 import AiAssistant from './components/sections/AiAssistant'
 import Footer from './components/sections/Footer'
 import AdminApp from './features/admin/AdminApp'
-import { AccountPage } from './features/auth/AccountPage'
+import { StudentApp } from './features/student/StudentApp'
 import { AuthPage } from './features/auth/AuthPage'
 import { ProtectedRoute } from './features/auth/ProtectedRoute'
 import { useAuth } from './hooks/useAuth'
@@ -37,7 +37,7 @@ function App() {
       <Route path="/cadastro" element={session ? <Navigate to="/" replace /> : <AuthPage mode="signup" />} />
       <Route path="/recuperar-senha" element={<AuthPage mode="recovery" />} />
       <Route element={<ProtectedRoute />}>
-        <Route path="/minha-conta" element={<AccountPage />} />
+        <Route path="/minha-conta/*" element={<StudentApp />} />
         <Route path="/conta" element={<Navigate to="/minha-conta" replace />} />
         <Route path="/admin/*" element={<AdminApp />} />
       </Route>

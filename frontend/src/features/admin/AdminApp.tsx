@@ -1,100 +1,36 @@
-import type { Session } from '@supabase/supabase-js'
-import { BarChart3, LogOut, MessageSquareText, Settings, Users } from 'lucide-react'
+import { Activity, Apple, BarChart3, Bot, ClipboardList, Dumbbell, FileText, Image, LogOut, Menu, MessageSquareText, Settings, Users, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
 import { adminApi } from '../../services/adminApi'
 import { AdminDashboard } from './AdminDashboard'
-import { AdminLogin } from './AdminLogin'
+import { AdminMfa } from './AdminMfa'
 import './admin.css'
 
-export type AdminSection = 'dashboard' | 'clients' | 'conversations' | 'settings'
-
-function routeState() {
-  const parts = window.location.pathname.split('/').filter(Boolean)
-  if (parts[1] === 'clientes') return { section: 'clients' as const, clientId: parts[2] || null }
-  if (parts[1] === 'conversas') return { section: 'conversations' as const, clientId: null }
-  if (parts[1] === 'configuracoes') return { section: 'settings' as const, clientId: null }
-  return { section: 'dashboard' as const, clientId: null }
-}
+export type AdminSection = 'dashboard' | 'students' | 'workouts' | 'assessments' | 'progress' | 'nutrition' | 'feedbacks' | 'transformations' | 'content' | 'ai' | 'settings'
+const items: Array<{ id: AdminSection; label: string; icon: typeof BarChart3; path: string }> = [
+  { id: 'dashboard', label: 'Dashboard', icon: BarChart3, path: '/admin' }, { id: 'students', label: 'Alunos', icon: Users, path: '/admin/alunos' }, { id: 'workouts', label: 'Treinos', icon: Dumbbell, path: '/admin/treinos' }, { id: 'assessments', label: 'Avaliações', icon: ClipboardList, path: '/admin/avaliacoes' }, { id: 'progress', label: 'Evolução', icon: Activity, path: '/admin/evolucao' }, { id: 'nutrition', label: 'Alimentação', icon: Apple, path: '/admin/alimentacao' }, { id: 'feedbacks', label: 'Feedbacks', icon: MessageSquareText, path: '/admin/feedbacks' }, { id: 'transformations', label: 'Transformações', icon: Image, path: '/admin/transformacoes' }, { id: 'content', label: 'Conteúdo do site', icon: FileText, path: '/admin/conteudo' }, { id: 'ai', label: 'IA da Karla', icon: Bot, path: '/admin/ia' }, { id: 'settings', label: 'Configurações', icon: Settings, path: '/admin/configuracoes' },
+]
+function currentSection(pathname: string): AdminSection { return items.find((item) => item.path !== '/admin' && pathname.startsWith(item.path))?.id || 'dashboard' }
 
 export default function AdminApp() {
-  const { signOut } = useAuth()
-  const navigateTo = useNavigate()
-  const [session, setSession] = useState<Session | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [authorized, setAuthorized] = useState(false)
-  const [recovery, setRecovery] = useState(false)
-  const initialRoute = routeState()
-  const [section, setSection] = useState<AdminSection>(initialRoute.section)
-  const [clientId, setClientId] = useState<string | null>(initialRoute.clientId)
-
+  const { session, signOut } = useAuth(); const navigate = useNavigate(); const location = useLocation(); const [authorized, setAuthorized] = useState(false); const [aal2, setAal2] = useState(false); const [loading, setLoading] = useState(true); const [drawer, setDrawer] = useState(false); const section = currentSection(location.pathname)
+  async function validateAccess() { if (!session) return; setLoading(true); try { await adminApi.me(); setAuthorized(true); const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel(); if (error) throw error; setAal2(data.currentLevel === 'aal2') } catch { setAuthorized(false); navigate('/minha-conta', { replace: true }) } finally { setLoading(false) } }
   useEffect(() => {
-    void supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session)
-      setLoading(false)
-    })
-    const { data } = supabase.auth.onAuthStateChange((event, nextSession) => {
-      setSession(nextSession)
-      setRecovery(event === 'PASSWORD_RECOVERY')
-      setAuthorized(false)
-    })
-    return () => data.subscription.unsubscribe()
-  }, [])
-
-  useEffect(() => {
-    if (!session || recovery) return
-    void adminApi.me()
-      .then(() => setAuthorized(true))
-      .catch(() => void supabase.auth.signOut())
-      .finally(() => setLoading(false))
-  }, [session, recovery])
-
-  if (loading) return <div className="admin-loading">Verificando sessão…</div>
-  if (!session || recovery) return <AdminLogin recovery={recovery} />
-  if (!authorized) return <div className="admin-loading">Validando acesso…</div>
-
-  const items: Array<[AdminSection, string, typeof BarChart3]> = [
-    ['dashboard', 'Visão geral', BarChart3],
-    ['clients', 'Clientes', Users],
-    ['conversations', 'Conversas', MessageSquareText],
-    ['settings', 'Configurações', Settings],
-  ]
-
-  async function handleSignOut() {
-    await signOut()
-    navigateTo('/login', { replace: true })
-  }
-
-  function navigate(next: AdminSection) {
-    const paths: Record<AdminSection, string> = { dashboard: '/admin', clients: '/admin/clientes', conversations: '/admin/conversas', settings: '/admin/configuracoes' }
-    window.history.pushState({}, '', paths[next])
-    setClientId(null)
-    setSection(next)
-  }
-
-  return (
-    <div className="admin-shell">
-      <aside className="admin-sidebar">
-        <a className="admin-brand" href="/">Karla <span>Premium</span></a>
-        <nav aria-label="Administração">
-          {items.map(([id, label, Icon]) => (
-            <button key={id} className={section === id ? 'active' : ''} onClick={() => navigate(id)}>
-              <Icon size={18} /> {label}
-            </button>
-          ))}
-        </nav>
-        <button className="admin-signout" onClick={() => void handleSignOut()}>
-          <LogOut size={18} /> Sair
-        </button>
-      </aside>
-      <main className="admin-main">
-        <header className="admin-topbar">
-          <div><small>Painel administrativo</small><strong>{session.user.email}</strong></div>
-        </header>
-        <AdminDashboard section={section} initialClientId={clientId} />
-      </main>
-    </div>
-  )
+    let active = true
+    if (!session) return () => { active = false }
+    void adminApi.me().then(async () => {
+      const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+      if (error) throw error
+      if (active) { setAuthorized(true); setAal2(data.currentLevel === 'aal2'); setLoading(false) }
+    }).catch(() => { if (active) { setAuthorized(false); setLoading(false); navigate('/minha-conta', { replace: true }) } })
+    return () => { active = false }
+  }, [navigate, session])
+  async function logout() { await signOut(); navigate('/login', { replace: true }) }
+  if (loading) return <div className="admin-loading"><div className="admin-skeleton"><i /><i /><i /></div><p>Validando acesso seguro…</p></div>
+  if (!authorized) return null
+  if (!aal2) return <main className="admin-mfa-page"><Link className="admin-brand" to="/">Karla <span>Premium</span></Link><AdminMfa required onVerified={() => void validateAccess()} /></main>
+  return <div className="admin-shell"><aside className={`admin-sidebar${drawer ? ' open' : ''}`}><div className="admin-sidebar-head"><Link className="admin-brand" to="/">Karla <span>Premium</span></Link><button onClick={() => setDrawer(false)} aria-label="Fechar menu"><X /></button></div><nav aria-label="Administração">{items.map(({ id, label, icon: Icon, path }) => <Link key={id} className={section === id ? 'active' : ''} to={path} onClick={() => setDrawer(false)}><Icon />{label}</Link>)}</nav><button className="admin-signout" onClick={() => void logout()}><LogOut />Sair</button></aside>{drawer && <button className="admin-backdrop" onClick={() => setDrawer(false)} aria-label="Fechar menu" />}
+    <div className="admin-content"><header className="admin-topbar"><button onClick={() => setDrawer(true)} aria-label="Abrir menu"><Menu /></button><div><small>Painel administrativo</small><strong>{session?.user.email}</strong></div></header><main><AdminDashboard section={section} /></main></div></div>
 }

@@ -15,7 +15,7 @@ export type StudentProfile = {
   restrictions: string | null
   injuries: string | null
   experience_level: 'beginner' | 'intermediate' | 'advanced' | null
-  role: 'client' | 'admin'
+  role: 'student' | 'admin'
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
