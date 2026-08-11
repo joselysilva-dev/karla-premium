@@ -75,6 +75,11 @@ As rotas sob `/api/admin` exigem um access token Supabase de um profile com
 `role = 'admin'`. Consulte [`../docs/PHASE_4_ADMIN_AUTH.md`](../docs/PHASE_4_ADMIN_AUTH.md)
 para endpoints, segurança, migration e criação do primeiro administrador.
 
+## Área do aluno
+
+Autenticação, profile, claim do histórico visitante e memória personalizada estão
+documentados em [`../docs/PHASE_5_CLIENT_AUTH.md`](../docs/PHASE_5_CLIENT_AUTH.md).
+
 Resposta de sucesso:
 
 ```json
