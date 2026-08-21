@@ -27,7 +27,13 @@ export async function authenticateToken(token, getClient = getSupabaseClient) {
     // getUser already validated the token; malformed claims fall back to AAL1.
   }
 
-  return { id: data.user.id, email: data.user.email, profile, aal };
+  return {
+    id: data.user.id,
+    email: data.user.email,
+    emailConfirmed: Boolean(data.user.email_confirmed_at),
+    profile,
+    aal,
+  };
 }
 
 export function createRequireAuth(getClient = getSupabaseClient) {

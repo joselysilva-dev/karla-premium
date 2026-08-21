@@ -92,14 +92,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async signInWithGoogle() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.origin },
+        options: { redirectTo: `${window.location.origin}/minha-conta` },
       })
       if (error) throw error
     },
     async sendMagicLink(email) {
       const { error } = await supabase.auth.signInWithOtp({
         email,
-        options: { emailRedirectTo: window.location.origin, shouldCreateUser: false },
+        options: { emailRedirectTo: `${window.location.origin}/minha-conta`, shouldCreateUser: false },
       })
       if (error) throw error
     },
@@ -107,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: fullName }, emailRedirectTo: window.location.origin },
+        options: { data: { full_name: fullName }, emailRedirectTo: `${window.location.origin}/minha-conta` },
       })
       if (error) throw error
       return Boolean(data.session)

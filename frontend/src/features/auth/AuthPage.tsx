@@ -48,14 +48,14 @@ export function AuthPage({ mode }: { mode: Mode }) {
         if (!password) throw { code: 'validation_failed' }
         const session = await auth.signIn(email, password)
         if (!session) throw { code: 'validation_failed' }
-        window.location.replace('/')
+        window.location.replace('/minha-conta')
         return
       }
       if (mode === 'signup') {
         if (password !== passwordConfirmation) throw { code: 'password_mismatch' }
         if (!acceptedTerms) throw { code: 'terms_required' }
         const active = await auth.signUp(email.trim(), password, fullName.trim())
-        if (active) window.location.assign('/')
+        if (active) window.location.assign('/minha-conta')
         else setNotice({ type: 'success', text: 'Cadastro realizado. Confira seu e-mail e confirme a conta para entrar.' })
         return
       }
@@ -114,7 +114,7 @@ export function AuthPage({ mode }: { mode: Mode }) {
         <button className="auth-primary" disabled={busy}>{busy ? 'Aguarde…' : mode === 'login' ? 'Entrar' : mode === 'signup' ? 'Criar minha conta' : recoveryPassword ? 'Salvar nova senha' : 'Enviar instruções'}</button>
         {mode === 'login' && <button className="auth-magic" type="button" disabled={busy} onClick={() => void magicLink()}>Entrar com link mágico</button>}
 
-        <nav>{mode === 'login' ? <><a href="/cadastro">Ainda não tenho conta</a><a href="/recuperar-senha">Esqueci minha senha</a></> : <a href="/login">Já tenho uma conta</a>}</nav>
+        <nav>{mode === 'login' ? <a href="/recuperar-senha">Esqueci minha senha</a> : <a href="/login">Voltar para o login</a>}</nav>
       </form>
     </section>
   </main>

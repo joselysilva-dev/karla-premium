@@ -12,6 +12,7 @@ import Footer from './components/sections/Footer'
 import AdminApp from './features/admin/AdminApp'
 import { StudentApp } from './features/student/StudentApp'
 import { AuthPage } from './features/auth/AuthPage'
+import { PremiumRoute } from './features/auth/PremiumRoute'
 import { ProtectedRoute } from './features/auth/ProtectedRoute'
 import { useAuth } from './hooks/useAuth'
 
@@ -33,16 +34,21 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/login" element={session ? <Navigate to="/" replace /> : <AuthPage mode="login" />} />
-      <Route path="/cadastro" element={session ? <Navigate to="/" replace /> : <AuthPage mode="signup" />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={session ? <Navigate to="/minha-conta" replace /> : <AuthPage mode="login" />} />
+      <Route path="/cadastro" element={<Navigate to="/login" replace />} />
       <Route path="/recuperar-senha" element={<AuthPage mode="recovery" />} />
-      <Route element={<ProtectedRoute />}>
+
+      <Route element={<PremiumRoute />}>
         <Route path="/minha-conta/*" element={<StudentApp />} />
         <Route path="/conta" element={<Navigate to="/minha-conta" replace />} />
+      </Route>
+
+      <Route element={<ProtectedRoute />}>
         <Route path="/admin/*" element={<AdminApp />} />
       </Route>
-      <Route path="/" element={session ? <LandingPage /> : <AuthPage mode="login" />} />
-      <Route path="*" element={<Navigate to={session ? '/' : '/login'} replace />} />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }
