@@ -3,8 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
 import { AuthContext, type AuthContextValue } from './auth-context'
-
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3001/api'
+import { API_URL } from '../services/apiClient'
 const VISITOR_KEY = 'karla-premium-visitor-id'
 
 type SafeAuthError = Error & { code?: string; status?: number }

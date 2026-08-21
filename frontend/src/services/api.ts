@@ -1,10 +1,5 @@
 import { supabase } from '../lib/supabase'
-
-const API_URL =
-  import.meta.env.VITE_API_URL ??
-  'http://localhost:3001/api'
-
-console.log('API usada pelo chat:', API_URL)
+import { API_URL } from './apiClient'
 
 const VISITOR_KEY = 'karla-premium-visitor-id'
 const CONVERSATION_KEY = 'karla-premium-conversation-id'
